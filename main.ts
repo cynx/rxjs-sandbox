@@ -1,17 +1,26 @@
-import {Observable, Observer} from "rxjs/Rx";
+import {Observable} from "rxjs/Observable";
+import {Observer} from "rxjs/Observer";
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+
 let numbers = [1,5,10];
 //let source =  Observable.from(numbers);
 
 let source = Observable.create(observer => {
-    for (let n of numbers){
-        if (n === 5){
-            observer.error('wrong');
-        }
-        observer.next(n);
-    }
+    let index = 0;
+    let produceValue = () => {
+        observer.next(numbers[index++]);
 
-    observer.complete();
-});
+        if (index < numbers.length){
+            setTimeout(produceValue,2000)
+        }else{
+            observer.complete();
+        }
+    };
+
+    produceValue();
+}).map(n=>n*2)
+    .filter(n=>n>4);
 //easier way
 source.subscribe(
     value=>console.log(value),
